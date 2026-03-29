@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  budgets     Budget[]
+  expenses    Expense[]
+  alerts      Alert[]
+
+  @@map("users")
+}
+
+model Budget {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  month            Int
+  year             Int
+  totalIncome      Float    @map("total_income")
+  totalFixed       Float    @map("total_fixed")
+  totalSpent       Float    @default(0) @map("total_spent")
+  availableBalance Float    @map("available_balance")
+  remainingBalance Float    @map("remaining_balance")
+  dailyBudget      Float    @map("daily_budget")
+  strategy         String   @default("LINEAR")
+  status           String   @default("HEALTHY")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adjustments BudgetAdjustment[]
+
+  @@unique([userId, month, year])
+  @@index([userId])
+  @@index([status])
+  @@map("budgets")
+}
+
+model Expense {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  budgetId  String?  @map("budget_id")
+  amount    Float
+  type      String   // FIXED | VARIABLE
+  category  String
+  date      DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([date])
+  @@map("expenses")
+}
+
+model BudgetAdjustment {
+  id                 String   @id @default(uuid())
+  budgetId           String   @map("budget_id")
+  previousDailyBudget Float   @map("previous_daily_budget")
+  newDailyBudget     Float    @map("new_daily_budget")
+  adjustment         Float
+  reason             String?
+  strategy           String
+  status             String
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  budget Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@index([budgetId])
+  @@map("budget_adjustments")
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   // BUDGET_WARNING | BUDGET_CRITICAL | BUDGET_NEGATIVE | DAILY_LIMIT_EXCEEDED
+  message   String
+  severity  String   // INFO | WARNING | CRITICAL
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([severity])
+  @@map("alerts")
+}
