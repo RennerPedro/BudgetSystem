@@ -107,11 +107,15 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
+      <div className="space-y-6">
+        <div className="skeleton h-12 w-56" />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+          <div className="skeleton h-36" />
+          <div className="skeleton h-36" />
+          <div className="skeleton h-36" />
+          <div className="skeleton h-36" />
         </div>
+        <div className="skeleton h-64" />
       </div>
     );
   }
@@ -121,11 +125,11 @@ export default function DashboardPage() {
       <div className="max-w-2xl mx-auto">
         <Card>
           <div className="text-center py-12">
-            <TrendingUp className="w-16 h-16 text-primary-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <TrendingUp className="mx-auto mb-4 h-12 w-12 text-[var(--text-tertiary)]" />
+            <h2 className="mb-2 text-[var(--text-2xl)] font-semibold text-[var(--text-primary)]">
               Bem-vindo ao Budget System!
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="mb-6 text-[var(--text-base)] text-[var(--text-secondary)]">
               Comece criando seu orçamento para o mês atual
             </p>
             <Button onClick={() => setShowCreateBudget(true)}>
@@ -164,11 +168,11 @@ export default function DashboardPage() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="mb-2 block text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
                 Estratégia de Orçamento
               </label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="input-shell"
                 value={strategy}
                 onChange={(e) => setStrategy(e.target.value as any)}
               >
@@ -176,7 +180,7 @@ export default function DashboardPage() {
                 <option value="AGGRESSIVE">Agressiva - Correção rápida de excessos</option>
                 <option value="SMART">Inteligente - Baseada em padrões (AI-ready)</option>
               </select>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-[var(--text-sm)] text-[var(--text-secondary)]">
                 {strategy === 'LINEAR' && 'Divide o saldo restante igualmente pelos dias que faltam.'}
                 {strategy === 'AGGRESSIVE' && 'Aplica correções agressivas quando detecta gastos excessivos.'}
                 {strategy === 'SMART' && 'Analisa padrões de gasto e faz previsões inteligentes.'}
@@ -203,9 +207,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Visão geral do seu orçamento e gastos</p>
+      <div className="section-header">
+        <div>
+          <h1 className="text-[var(--text-2xl)] font-semibold text-[var(--text-primary)]">Dashboard</h1>
+          <p className="mt-1 text-[var(--text-base)] text-[var(--text-secondary)]">Visão consolidada de orçamento, despesas e alertas</p>
+        </div>
       </div>
 
       {budget && (
@@ -226,11 +232,11 @@ export default function DashboardPage() {
               <Card title="Alterar Estratégia">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Estratégia Atual: <span className="font-bold text-primary-600">{budget.strategy}</span>
+                    <label className="mb-2 block text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
+                      Estratégia Atual: <span className="font-semibold text-[var(--accent-primary)]">{budget.strategy}</span>
                     </label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="input-shell"
                       value={selectedStrategy}
                       onChange={(e) => {
                         const newStrategy = e.target.value as 'LINEAR' | 'AGGRESSIVE' | 'SMART';
@@ -245,7 +251,7 @@ export default function DashboardPage() {
                     </select>
                   </div>
                   {isUpdatingStrategy && (
-                    <p className="text-sm text-primary-600">Atualizando estratégia...</p>
+                    <p className="text-[var(--text-sm)] text-[var(--accent-primary)]">Atualizando estratégia...</p>
                   )}
                 </div>
               </Card>
@@ -267,7 +273,7 @@ export default function DashboardPage() {
                   </Button>
                 </form>
 
-                <form onSubmit={handleUpdateFixed} className="space-y-3 mt-5 pt-5 border-t border-gray-200">
+                <form onSubmit={handleUpdateFixed} className="mt-5 space-y-3 border-t border-[var(--border-subtle)] pt-5">
                   <Input
                     label="Fixos planejados do mês"
                     type="number"

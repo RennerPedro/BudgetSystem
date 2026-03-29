@@ -10,18 +10,18 @@ interface BadgeProps {
 
 export function Badge({ children, variant = 'default', className }: BadgeProps) {
   const variants = {
-    HEALTHY: 'bg-success-100 text-success-700',
-    WARNING: 'bg-warning-100 text-warning-700',
-    CRITICAL: 'bg-danger-100 text-danger-700',
-    NEGATIVE: 'bg-danger-100 text-danger-700',
-    INFO: 'bg-primary-100 text-primary-700',
-    default: 'bg-gray-100 text-gray-700',
+    HEALTHY: 'bg-[rgba(0,196,140,0.16)] text-[var(--accent-success)] border border-[rgba(0,196,140,0.35)]',
+    WARNING: 'bg-[rgba(245,166,35,0.16)] text-[var(--accent-warning)] border border-[rgba(245,166,35,0.35)]',
+    CRITICAL: 'bg-[rgba(255,77,77,0.16)] text-[var(--accent-danger)] border border-[rgba(255,77,77,0.35)]',
+    NEGATIVE: 'bg-[rgba(255,77,77,0.16)] text-[var(--accent-danger)] border border-[rgba(255,77,77,0.35)]',
+    INFO: 'bg-[var(--accent-primary-muted)] text-[var(--accent-primary)] border border-[rgba(45,127,249,0.35)]',
+    default: 'bg-[var(--surface-overlay)] text-[var(--text-secondary)] border border-[var(--border-subtle)]',
   };
 
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+        'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium leading-4',
         variants[variant] || variants.default,
         className
       )}

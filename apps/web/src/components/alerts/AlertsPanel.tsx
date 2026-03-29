@@ -13,9 +13,10 @@ export function AlertsPanel() {
   if (alerts.length === 0) {
     return (
       <Card title="Alertas">
-        <div className="text-center py-8">
-          <Bell className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500">Nenhum alerta no momento</p>
+        <div className="py-10 text-center">
+          <Bell className="mx-auto mb-3 h-8 w-8 text-[var(--text-tertiary)]" />
+          <p className="text-[var(--text-base)] text-[var(--text-secondary)]">Nenhum alerta no momento</p>
+          <p className="mt-1 text-[var(--text-sm)] text-[var(--text-tertiary)]">Seu orçamento está sob controle.</p>
         </div>
       </Card>
     );
@@ -51,8 +52,8 @@ export function AlertsPanel() {
             key={alert.id}
             className={`p-4 rounded-lg border transition-colors ${
               alert.read
-                ? 'bg-gray-50 border-gray-200'
-                : 'bg-white border-gray-300 shadow-sm'
+                ? 'bg-[var(--surface-overlay)] border-[var(--border-subtle)]'
+                : 'bg-[var(--surface-raised)] border-[var(--border-default)]'
             }`}
           >
             <div className="flex items-start justify-between mb-2">
@@ -67,10 +68,10 @@ export function AlertsPanel() {
                 </Button>
               )}
             </div>
-            <p className={`text-sm mb-1 ${alert.read ? 'text-gray-600' : 'text-gray-900 font-medium'}`}>
+            <p className={`mb-1 text-[var(--text-sm)] ${alert.read ? 'text-[var(--text-secondary)]' : 'text-[var(--text-primary)] font-medium'}`}>
               {alert.message}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="financial-figure text-[var(--text-xs)] text-[var(--text-tertiary)]">
               {formatDateTime(alert.createdAt)}
             </p>
           </div>

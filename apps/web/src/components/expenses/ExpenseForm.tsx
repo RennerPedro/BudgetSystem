@@ -55,12 +55,12 @@ export function ExpenseForm({ month, year }: ExpenseFormProps = {}) {
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="mb-2 block text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
             Categoria
           </label>
           <input
             type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="input-shell"
             placeholder="alimentação, transporte, lazer..."
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -69,11 +69,11 @@ export function ExpenseForm({ month, year }: ExpenseFormProps = {}) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="mb-2 block text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
             Tipo
           </label>
           <select
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="input-shell"
             value={type}
             onChange={(e) => setType(e.target.value as ExpenseType)}
           >

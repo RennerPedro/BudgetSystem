@@ -37,19 +37,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-700 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-base)] p-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Budget System</h1>
-          <p className="text-primary-100">Gestão Financeira Inteligente</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-[var(--text-display)] font-semibold text-[var(--text-primary)]">Budget System</h1>
+          <p className="mt-2 text-[var(--text-base)] text-[var(--text-secondary)]">Gestão financeira com controle diário inteligente</p>
         </div>
 
         <Card>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Entrar</h2>
+          <h2 className="mb-6 text-[var(--text-2xl)] font-semibold text-[var(--text-primary)]">Entrar</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg">
-              <p className="text-sm text-danger-700">{error}</p>
+            <div className="mb-4 rounded-lg border border-[rgba(255,77,77,0.45)] bg-[rgba(255,77,77,0.12)] p-3">
+              <p className="text-[var(--text-sm)] text-[var(--accent-danger)]">{error}</p>
             </div>
           )}
 
@@ -78,9 +78,9 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-[var(--text-sm)] text-[var(--text-secondary)]">
               Não tem uma conta?{' '}
-              <Link href="/register" className="text-primary-600 hover:text-primary-700 font-medium">
+              <Link href="/register" className="font-medium text-[var(--accent-primary)] hover:opacity-90">
                 Cadastre-se
               </Link>
             </p>

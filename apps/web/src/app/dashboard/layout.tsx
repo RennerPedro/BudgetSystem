@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { QueryProvider } from '@/providers/query-provider';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function DashboardLayout({
@@ -36,18 +36,17 @@ export default function DashboardLayout({
 
   return (
     <QueryProvider>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
+      <div className="min-h-screen bg-[var(--surface-base)]">
+        <nav className="border-b border-[var(--border-subtle)] bg-[var(--surface-base)]">
+          <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between px-8">
               <div className="flex items-center">
-                <h1 className="text-xl font-bold text-primary-600">
+                <h1 className="text-[var(--text-xl)] font-semibold text-[var(--text-primary)]">
                   Budget System
                 </h1>
               </div>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-700">{user?.email}</span>
+                <span className="financial-figure text-[var(--text-sm)] text-[var(--text-secondary)]">{user?.email}</span>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -57,11 +56,10 @@ export default function DashboardLayout({
                   Sair
                 </Button>
               </div>
-            </div>
           </div>
         </nav>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="mx-auto w-full max-w-[1200px] px-8 py-8">
           {children}
         </main>
       </div>

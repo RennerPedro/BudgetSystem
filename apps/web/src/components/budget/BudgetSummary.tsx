@@ -26,65 +26,65 @@ export function BudgetSummary({ budget, stats }: BudgetSummaryProps) {
 
   return (
     <Card>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-[var(--text-2xl)] font-semibold text-[var(--text-primary)]">
             {getMonthName(budget.month)} {budget.year}
           </h2>
-          <p className="text-sm text-gray-600">Orçamento do mês</p>
+          <p className="mt-1 text-[var(--text-sm)] text-[var(--text-secondary)]">Orçamento do mês</p>
         </div>
         <Badge variant={budget.status}>{budget.status}</Badge>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="p-4 bg-primary-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-primary-700">Renda Mensal</span>
-            <DollarSign className="w-5 h-5 text-primary-600" />
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="card-shell p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="stat-label">Renda Mensal</span>
+            <DollarSign className="h-4 w-4 text-[var(--text-secondary)]" />
           </div>
-          <p className="text-2xl font-bold text-primary-900">
+          <p className="stat-value-primary">
             {formatCurrency(budget.totalIncome)}
           </p>
         </div>
 
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-700">Fixos Planejados</span>
-            <Calendar className="w-5 h-5 text-gray-600" />
+        <div className="card-shell p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="stat-label">Fixos Planejados</span>
+            <Calendar className="h-4 w-4 text-[var(--text-secondary)]" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="stat-value">
             {formatCurrency(fixedPlanned)}
           </p>
-          <p className="text-xs text-gray-600 mt-1">
+          <p className="stat-note mt-2">
             Lançados em despesas: {formatCurrency(fixedSpent)}
           </p>
         </div>
 
-        <div className="p-4 bg-warning-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-warning-700">Gastos Variáveis</span>
-            <TrendingDown className="w-5 h-5 text-warning-600" />
+        <div className="card-shell p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="stat-label">Gastos Variáveis</span>
+            <TrendingDown className="h-4 w-4 text-[var(--text-secondary)]" />
           </div>
-          <p className="text-2xl font-bold text-warning-900">
+          <p className="stat-value">
             {formatCurrency(variableSpent)}
           </p>
-          <p className="text-xs text-warning-700 mt-1">
-            {variablePercentage.toFixed(1)}% da renda mensal
+          <p className="financial-figure mt-2 text-[var(--text-xs)] text-[var(--accent-warning)]">
+            {variablePercentage.toFixed(1)}% da renda mensal (somente variáveis)
           </p>
-          <p className="text-xs text-warning-700 mt-1">
+          <p className="stat-note financial-figure mt-1">
             Total lançado no mês: {formatCurrency(totalSpentInMonth)}
           </p>
         </div>
 
-        <div className="p-4 bg-success-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-success-700">Saldo Restante</span>
-            <TrendingUp className="w-5 h-5 text-success-600" />
+        <div className="card-shell p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="stat-label">Saldo Restante</span>
+            <TrendingUp className="h-4 w-4 text-[var(--text-secondary)]" />
           </div>
-          <p className="text-2xl font-bold text-success-900">
+          <p className="stat-value-primary">
             {formatCurrency(remainingRealBalance)}
           </p>
-          <p className="text-xs text-success-700 mt-1">
+          <p className="stat-note mt-2">
             Renda - total lançado
           </p>
         </div>
@@ -92,33 +92,33 @@ export function BudgetSummary({ budget, stats }: BudgetSummaryProps) {
 
       <div className="space-y-4">
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
               Progresso do mês
             </span>
-            <span className="text-sm text-gray-600">
+            <span className="financial-figure text-[var(--text-sm)] text-[var(--text-secondary)]">
               Dia {currentDay} de {daysInMonth}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="h-2 w-full rounded-full bg-[var(--surface-overlay)]">
             <div
-              className="bg-primary-600 h-2 rounded-full transition-all"
+              className="h-2 rounded-full bg-[var(--accent-primary)] transition-all"
               style={{ width: `${Math.min(progressPercentage, 100)}%` }}
             />
           </div>
         </div>
 
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
+        <div className="border-t border-[var(--border-subtle)] pt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
               Orçamento diário atual
             </span>
-            <span className="text-lg font-bold text-primary-600">
+            <span className="financial-figure text-[var(--text-xl)] font-semibold text-[var(--accent-primary)]">
               {formatCurrency(budget.dailyBudget)}
             </span>
           </div>
-          <p className="text-xs text-gray-600">
-            Estratégia: <span className="font-medium">{budget.strategy}</span>
+          <p className="text-[var(--text-xs)] text-[var(--text-secondary)]">
+            Estratégia: <span className="font-medium text-[var(--text-primary)]">{budget.strategy}</span>
           </p>
         </div>
       </div>

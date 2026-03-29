@@ -7,36 +7,37 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['var(--font-display)', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
+      },
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-        },
-        success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          500: '#22c55e',
-          700: '#15803d',
-        },
-        warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          500: '#f59e0b',
-          700: '#b45309',
-        },
-        danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          500: '#ef4444',
-          700: '#b91c1c',
+        finance: {
+          surface: {
+            base: 'var(--surface-base)',
+            raised: 'var(--surface-raised)',
+            overlay: 'var(--surface-overlay)',
+            sunken: 'var(--surface-sunken)',
+          },
+          accent: {
+            primary: 'var(--accent-primary)',
+            primaryMuted: 'var(--accent-primary-muted)',
+            success: 'var(--accent-success)',
+            danger: 'var(--accent-danger)',
+            warning: 'var(--accent-warning)',
+          },
+          text: {
+            primary: 'var(--text-primary)',
+            secondary: 'var(--text-secondary)',
+            tertiary: 'var(--text-tertiary)',
+            inverse: 'var(--text-inverse)',
+          },
+          border: {
+            subtle: 'var(--border-subtle)',
+            default: 'var(--border-default)',
+            strong: 'var(--border-strong)',
+          },
         },
       },
     },

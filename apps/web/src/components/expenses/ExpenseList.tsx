@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { useExpenses } from '@/hooks/useExpenses';
 import { Expense, ExpenseStats } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Trash2 } from 'lucide-react';
+import { Receipt, Trash2 } from 'lucide-react';
 
 interface ExpenseListProps {
   month?: number;
@@ -50,51 +50,72 @@ export function ExpenseList({
   if (expenses.length === 0) {
     return (
       <Card title="Despesas do Mês">
-        <p className="text-center text-gray-500 py-8">
-          Nenhuma despesa registrada ainda.
-        </p>
+        <div className="py-10 text-center">
+          <Receipt className="mx-auto mb-3 h-8 w-8 text-[var(--text-tertiary)]" />
+          <p className="text-[var(--text-base)] text-[var(--text-secondary)]">Nenhuma despesa registrada neste período.</p>
+          <p className="mt-1 text-[var(--text-sm)] text-[var(--text-tertiary)]">Adicione uma despesa para iniciar o acompanhamento.</p>
+        </div>
       </Card>
     );
   }
 
   return (
     <Card title="Despesas do Mês">
-      <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-700">
-        <span className="font-medium">Variáveis:</span> {formatCurrency(totalVariable)}
+      <div className="mb-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-overlay)] p-3 text-[var(--text-sm)] text-[var(--text-secondary)]">
+        <span className="font-medium text-[var(--text-primary)]">Variáveis:</span>{' '}
+        <span className="financial-figure">{formatCurrency(totalVariable)}</span>
         {' • '}
-        <span className="font-medium">Fixas:</span> {formatCurrency(totalFixed)}
+        <span className="font-medium text-[var(--text-primary)]">Fixas:</span>{' '}
+        <span className="financial-figure">{formatCurrency(totalFixed)}</span>
         {' • '}
-        <span className="font-medium">Total listado:</span> {formatCurrency(totalVariable + totalFixed)}
+        <span className="font-medium text-[var(--text-primary)]">Total listado:</span>{' '}
+        <span className="financial-figure">{formatCurrency(totalVariable + totalFixed)}</span>
       </div>
 
-      <div className="space-y-3">
+      <div className="overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-raised)]">
+        <div className="grid min-h-12 grid-cols-[1.7fr_0.9fr_0.8fr_72px] items-center border-b border-[var(--border-subtle)] px-4 text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
+          <span>Categoria</span>
+          <span>Tipo</span>
+          <span className="text-right">Valor</span>
+          <span className="text-right">Ação</span>
+        </div>
+
         {expenses.map((expense) => (
           <div
             key={expense.id}
-            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            className="grid min-h-12 grid-cols-[1.7fr_0.9fr_0.8fr_72px] items-center border-b border-[var(--border-subtle)] px-4 transition-colors hover:bg-[var(--accent-primary-muted)]"
           >
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-gray-900 capitalize">
-                  {expense.category}
-                </span>
-                <Badge variant="default">{expense.type}</Badge>
-              </div>
-              <p className="text-sm text-gray-600">
-                {formatDate(expense.date)}
-              </p>
+            <div className="py-3">
+              <p className="text-[var(--text-base)] font-medium capitalize text-[var(--text-primary)]">{expense.category}</p>
+              <p className="financial-figure text-[var(--text-xs)] text-[var(--text-secondary)]">{formatDate(expense.date)}</p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-bold text-gray-900">
+
+            <div>
+              <Badge
+                variant="default"
+                className={expense.type === 'FIXED'
+                  ? 'border-[rgba(245,166,35,0.35)] bg-[rgba(245,166,35,0.16)] text-[var(--accent-warning)]'
+                  : 'border-[rgba(45,127,249,0.35)] bg-[var(--accent-primary-muted)] text-[var(--accent-primary)]'}
+              >
+                {expense.type}
+              </Badge>
+            </div>
+
+            <div className="text-right">
+              <span className="financial-figure text-[var(--text-base)] font-semibold text-[var(--text-primary)]">
                 {formatCurrency(expense.amount)}
               </span>
+            </div>
+
+            <div className="flex justify-end">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => deleteExpense(expense.id)}
                 disabled={isDeleting}
+                aria-label="Excluir despesa"
               >
-                <Trash2 className="w-4 h-4 text-danger-600" />
+                <Trash2 className="h-4 w-4 text-[var(--accent-danger)]" />
               </Button>
             </div>
           </div>
