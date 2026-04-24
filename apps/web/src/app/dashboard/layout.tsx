@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { QueryProvider } from '@/providers/query-provider';
 import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { AIHeaderKeyButton } from '@/components/ai/AIHeaderKeyButton';
 
 export default function DashboardLayout({
   children,
@@ -46,6 +47,7 @@ export default function DashboardLayout({
               </div>
 
               <div className="flex items-center gap-4">
+                <AIHeaderKeyButton />
                 <span className="financial-figure text-[var(--text-sm)] text-[var(--text-secondary)]">{user?.email}</span>
                 <Button
                   variant="ghost"
