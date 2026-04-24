@@ -3,12 +3,14 @@ import { PrismaService } from '../../infrastructure/database/prisma.service';
 import { CreateExpenseDto, ExpenseResponseDto, ExpenseStatsDto } from '../dtos';
 import { ExpenseType } from '../../domain/types';
 import { BudgetService } from './budget.service';
+import { CategorizationService } from '../../modules/deepseek/services/categorization.service';
 
 @Injectable()
 export class ExpenseService {
   constructor(
     private prisma: PrismaService,
     private budgetService: BudgetService,
+    private categorizationService: CategorizationService,
   ) {}
 
   async createExpense(userId: string, dto: CreateExpenseDto): Promise<ExpenseResponseDto> {
@@ -16,26 +18,40 @@ export class ExpenseService {
     const month = expenseDate.getMonth() + 1;
     const year = expenseDate.getFullYear();
 
-    // Find or create budget for this month
     let budget = await this.prisma.budget.findUnique({
       where: {
         userId_month_year: { userId, month, year },
       },
     });
 
-    // Create expense
+    let category = dto.category?.trim() || '';
+
+    if (dto.autoCategorize || !category?.trim()) {
+      try {
+        const suggestion = await this.categorizationService.suggestCategory(
+          userId,
+          dto.category || 'uncategorized expense',
+          dto.amount,
+        );
+        category = suggestion.category;
+      } catch (error) {
+        category = category || 'other';
+      }
+    }
+
+    const normalizedCategory = category.trim() || 'other';
+
     const expense = await this.prisma.expense.create({
       data: {
         userId,
         budgetId: budget?.id,
         amount: dto.amount,
         type: dto.type,
-        category: dto.category,
+        category: normalizedCategory,
         date: expenseDate,
       },
     });
 
-    // Recalculate budget for this month after any expense mutation.
     if (budget) {
       await this.syncBudgetTotalSpent(budget.id, userId, month, year);
       await this.budgetService.recalculateBudget(budget.id);
@@ -52,17 +68,20 @@ export class ExpenseService {
     month?: number,
     year?: number,
   ): Promise<ExpenseResponseDto[]> {
-    const where: any = { userId };
+    const dateFilter =
+      month && year
+        ? {
+            date: {
+              gte: new Date(year, month - 1, 1),
+              lte: new Date(year, month, 0),
+            },
+          }
+        : {};
 
-    if (month && year) {
-      const startDate = new Date(year, month - 1, 1);
-      const endDate = new Date(year, month, 0);
-
-      where.date = {
-        gte: startDate,
-        lte: endDate,
-      };
-    }
+    const where = {
+      userId,
+      ...dateFilter,
+    };
 
     const expenses = await this.prisma.expense.findMany({
       where,

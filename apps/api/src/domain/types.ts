@@ -1,6 +1,6 @@
 export type BudgetStatus = 'HEALTHY' | 'WARNING' | 'CRITICAL' | 'NEGATIVE';
 
-export type ExpenseType = 'FIXED' | 'VARIABLE';
+export type ExpenseType = 'VARIABLE';
 
 export type AlertType = 
   | 'BUDGET_WARNING' 

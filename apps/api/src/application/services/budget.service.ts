@@ -9,12 +9,16 @@ import {
   BudgetResponseDto,
 } from '../dtos';
 import { BudgetStatus, StrategyType } from '../../domain/types';
+import { BudgetPredictionService } from '../../modules/deepseek/services/budget-prediction.service';
 
 @Injectable()
 export class BudgetService {
   private budgetEngine: BudgetEngine;
 
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    private budgetPredictionService: BudgetPredictionService,
+  ) {
     this.budgetEngine = new BudgetEngine();
   }
 
@@ -23,7 +27,6 @@ export class BudgetService {
     const month = now.getMonth() + 1;
     const year = now.getFullYear();
 
-    // Check if budget already exists for this month
     const existingBudget = await this.prisma.budget.findUnique({
       where: {
         userId_month_year: { userId, month, year },
@@ -34,7 +37,6 @@ export class BudgetService {
       throw new BadRequestException('Budget for this month already exists');
     }
 
-    // Calculate initial values
     const totalDays = this.budgetEngine.getDaysInMonth(month, year);
     const available = dto.totalIncome - dto.totalFixed;
     const dailyBudget = this.budgetEngine.calculateInitial(
@@ -96,7 +98,6 @@ export class BudgetService {
       data: { strategy: dto.strategy },
     });
 
-    // Recalculate immediately so client receives updated daily budget without requiring another action.
     await this.recalculateBudget(budget.id);
 
     const recalculatedBudget = await this.prisma.budget.findUnique({
@@ -117,28 +118,24 @@ export class BudgetService {
   async updateIncome(userId: string, dto: UpdateBudgetIncomeDto): Promise<BudgetResponseDto> {
     const budget = await this.getCurrentBudget(userId);
     const monthlyVariableSpent = await this.getMonthlyVariableSpent(userId, budget.month, budget.year);
-    const launchedFixed = await this.getLaunchedFixedAmount(
-      userId,
-      budget.month,
-      budget.year,
-    );
 
     const totalDays = this.budgetEngine.getDaysInMonth(budget.month, budget.year);
     const currentDay = this.budgetEngine.getCurrentDay();
-    const availableBalance = dto.totalIncome - launchedFixed;
+    const availableBalance = dto.totalIncome - budget.totalFixed;
     const remainingBalance = availableBalance - monthlyVariableSpent;
 
-    const result = this.budgetEngine.calculate(
+    const result = await this.calculateBudgetResult(
+      budget.userId,
       {
         totalIncome: dto.totalIncome,
-        totalFixed: launchedFixed,
+        totalFixed: budget.totalFixed,
         totalSpent: monthlyVariableSpent,
         totalDays,
         currentDay,
         previousDailyBudget: budget.dailyBudget,
         targetReservePercent: this.getTargetReservePercent(budget.strategy as StrategyType),
       },
-      budget.strategy,
+      budget.strategy as StrategyType,
     );
 
     const updatedBudget = await this.prisma.budget.update({
@@ -175,28 +172,24 @@ export class BudgetService {
   async updateFixed(userId: string, dto: UpdateBudgetFixedDto): Promise<BudgetResponseDto> {
     const budget = await this.getCurrentBudget(userId);
     const monthlyVariableSpent = await this.getMonthlyVariableSpent(userId, budget.month, budget.year);
-    const launchedFixed = await this.getLaunchedFixedAmount(
-      userId,
-      budget.month,
-      budget.year,
-    );
 
     const totalDays = this.budgetEngine.getDaysInMonth(budget.month, budget.year);
     const currentDay = this.budgetEngine.getCurrentDay();
-    const availableBalance = budget.totalIncome - launchedFixed;
+    const availableBalance = budget.totalIncome - dto.totalFixed;
     const remainingBalance = availableBalance - monthlyVariableSpent;
 
-    const result = this.budgetEngine.calculate(
+    const result = await this.calculateBudgetResult(
+      budget.userId,
       {
         totalIncome: budget.totalIncome,
-        totalFixed: launchedFixed,
+        totalFixed: dto.totalFixed,
         totalSpent: monthlyVariableSpent,
         totalDays,
         currentDay,
         previousDailyBudget: budget.dailyBudget,
         targetReservePercent: this.getTargetReservePercent(budget.strategy as StrategyType),
       },
-      budget.strategy,
+      budget.strategy as StrategyType,
     );
 
     const updatedBudget = await this.prisma.budget.update({
@@ -246,15 +239,10 @@ export class BudgetService {
       budget.month,
       budget.year,
     );
-    const launchedFixed = await this.getLaunchedFixedAmount(
-      budget.userId,
-      budget.month,
-      budget.year,
-    );
 
     const context = {
       totalIncome: budget.totalIncome,
-      totalFixed: launchedFixed,
+      totalFixed: budget.totalFixed,
       totalSpent: monthlyVariableSpent,
       totalDays,
       currentDay,
@@ -262,21 +250,23 @@ export class BudgetService {
       targetReservePercent: this.getTargetReservePercent(budget.strategy as StrategyType),
     };
 
-    const result = this.budgetEngine.calculate(context, budget.strategy as StrategyType);
+    const result = await this.calculateBudgetResult(
+      budget.userId,
+      context,
+      budget.strategy as StrategyType,
+    );
 
-    // Update budget
     await this.prisma.budget.update({
       where: { id: budgetId },
       data: {
         totalSpent: monthlyVariableSpent,
         dailyBudget: result.newDailyBudget,
-        availableBalance: budget.totalIncome - launchedFixed,
-        remainingBalance: budget.totalIncome - launchedFixed - monthlyVariableSpent,
+        availableBalance: budget.totalIncome - budget.totalFixed,
+        remainingBalance: budget.totalIncome - budget.totalFixed - monthlyVariableSpent,
         status: result.status,
       },
     });
 
-    // Create adjustment record
     await this.prisma.budgetAdjustment.create({
       data: {
         budgetId,
@@ -289,7 +279,6 @@ export class BudgetService {
       },
     });
 
-    // Generate alerts if needed
     await this.generateAlertsIfNeeded(budget.userId, result.status, result.reason);
   }
 
@@ -329,7 +318,7 @@ export class BudgetService {
     }
   }
 
-  async getAdjustmentHistory(userId: string): Promise<any[]> {
+  async getAdjustmentHistory(userId: string): Promise<unknown[]> {
     const budget = await this.getCurrentBudget(userId);
 
     return this.prisma.budgetAdjustment.findMany({
@@ -343,7 +332,7 @@ export class BudgetService {
       case 'LINEAR':
         return 0;
       case 'AGGRESSIVE':
-        return 0.03;
+        return 0.1;
       case 'SMART':
         return 0.07;
       default:
@@ -376,28 +365,55 @@ export class BudgetService {
     return aggregate._sum.amount ?? 0;
   }
 
-  private async getLaunchedFixedAmount(
+  private async calculateBudgetResult(
     userId: string,
-    month: number,
-    year: number,
-  ): Promise<number> {
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    context: {
+      totalIncome: number;
+      totalFixed: number;
+      totalSpent: number;
+      totalDays: number;
+      currentDay: number;
+      previousDailyBudget: number;
+      targetReservePercent: number;
+    },
+    strategy: StrategyType,
+  ) {
+    const heuristic = this.budgetEngine.calculate(context, strategy);
 
-    const aggregate = await this.prisma.expense.aggregate({
-      where: {
-        userId,
-        type: 'FIXED',
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      _sum: {
-        amount: true,
-      },
+    if (strategy !== 'SMART') {
+      return heuristic;
+    }
+
+    const prediction = await this.budgetPredictionService.predictBudget(userId, {
+      totalIncome: context.totalIncome,
+      totalFixed: context.totalFixed,
+      totalSpent: context.totalSpent,
+      currentDay: context.currentDay,
+      totalDays: context.totalDays,
     });
 
-    return aggregate._sum.amount ?? 0;
+    if (!prediction) {
+      return {
+        ...heuristic,
+        reason: `${heuristic.reason} (AI unavailable, heuristic fallback active)`,
+      };
+    }
+
+    const remainingDays = Math.max(1, context.totalDays - context.currentDay);
+    const available = Math.max(0, context.totalIncome - context.totalFixed);
+    const remainingBalance = Math.max(0, available - context.totalSpent);
+    const aiDaily = Math.max(0, Math.min(prediction.recommendedDailyBudget, remainingBalance / remainingDays));
+
+    return {
+      newDailyBudget: aiDaily,
+      adjustment: aiDaily - context.previousDailyBudget,
+      status:
+        prediction.riskLevel === 'CRITICAL'
+          ? 'CRITICAL'
+          : prediction.riskLevel === 'HIGH'
+            ? 'WARNING'
+            : heuristic.status,
+      reason: `AI Smart Strategy (${Math.round(prediction.confidence * 100)}% confidence): ${prediction.reasoning}`,
+    };
   }
 }

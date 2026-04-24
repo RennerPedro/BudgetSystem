@@ -5,9 +5,11 @@ import { BudgetController } from '../interface/controllers/budget.controller';
 import { BudgetService } from '../application/services/budget.service';
 import { BudgetProcessor } from '../infrastructure/queue/budget.processor';
 import { PrismaService } from '../infrastructure/database/prisma.service';
+import { DeepSeekModule } from './deepseek/deepseek.module';
 
 @Module({
   imports: [
+    DeepSeekModule,
     BullModule.registerQueueAsync({
       name: 'budget',
       imports: [ConfigModule],

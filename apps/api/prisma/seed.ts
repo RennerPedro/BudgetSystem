@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Clean existing data
   await prisma.alert.deleteMany();
   await prisma.budgetAdjustment.deleteMany();
   await prisma.expense.deleteMany();
@@ -15,7 +14,6 @@ async function main() {
 
   console.log('🗑️  Cleaned existing data');
 
-  // Create test user
   const passwordHash = await bcrypt.hash('password123', 10);
   const user = await prisma.user.create({
     data: {
@@ -26,7 +24,6 @@ async function main() {
 
   console.log('👤 Created test user:', user.email);
 
-  // Create current month budget
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
@@ -52,7 +49,6 @@ async function main() {
 
   console.log('💰 Created budget for', `${month}/${year}`);
 
-  // Create sample expenses
   const categories = ['food', 'transport', 'entertainment', 'utilities', 'health'];
   const expenses = [];
 
@@ -82,30 +78,6 @@ async function main() {
 
   console.log(`📊 Created ${expenses.length} sample expenses`);
 
-  // Create fixed expenses
-  const fixedExpenses = [
-    { category: 'rent', amount: 1200 },
-    { category: 'internet', amount: 80 },
-    { category: 'phone', amount: 50 },
-    { category: 'insurance', amount: 150 },
-  ];
-
-  for (const fixed of fixedExpenses) {
-    await prisma.expense.create({
-      data: {
-        userId: user.id,
-        budgetId: budget.id,
-        amount: fixed.amount,
-        type: 'FIXED',
-        category: fixed.category,
-        date: new Date(year, month - 1, 1),
-      },
-    });
-  }
-
-  console.log(`🔒 Created ${fixedExpenses.length} fixed expenses`);
-
-  // Create sample alerts
   const alerts = [
     {
       type: 'BUDGET_WARNING',
@@ -130,7 +102,6 @@ async function main() {
 
   console.log(`🔔 Created ${alerts.length} sample alerts`);
 
-  // Create budget adjustment
   await prisma.budgetAdjustment.create({
     data: {
       budgetId: budget.id,
