@@ -2,20 +2,21 @@
 
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Budget, ExpenseStats } from '@/types';
+import { Budget, ExpenseStats, AIBudgetPrediction } from '@/types';
 import { formatCurrency, getMonthName } from '@/lib/utils';
 import { TrendingUp, TrendingDown, DollarSign, Calendar } from 'lucide-react';
+import { AIBadge } from '@/components/ai/AIBadge';
 
 interface BudgetSummaryProps {
   budget: Budget;
   stats?: ExpenseStats;
+  aiPrediction?: AIBudgetPrediction | null;
 }
 
-export function BudgetSummary({ budget, stats }: BudgetSummaryProps) {
+export function BudgetSummary({ budget, stats, aiPrediction }: BudgetSummaryProps) {
   const variableSpent = stats?.byType?.VARIABLE ?? budget.totalSpent;
-  const fixedSpent = stats?.byType?.FIXED ?? 0;
   const fixedPlanned = budget.totalFixed;
-  const totalSpentInMonth = variableSpent + fixedSpent;
+  const totalSpentInMonth = variableSpent;
   const remainingRealBalance = budget.totalIncome - totalSpentInMonth;
   const variablePercentage = budget.totalIncome > 0
     ? (variableSpent / budget.totalIncome) * 100
@@ -33,7 +34,10 @@ export function BudgetSummary({ budget, stats }: BudgetSummaryProps) {
           </h2>
           <p className="mt-1 text-[var(--text-sm)] text-[var(--text-secondary)]">Orçamento do mês</p>
         </div>
-        <Badge variant={budget.status}>{budget.status}</Badge>
+        <div className="flex items-center gap-2">
+          {aiPrediction && <AIBadge />}
+          <Badge variant={budget.status}>{budget.status}</Badge>
+        </div>
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -56,7 +60,7 @@ export function BudgetSummary({ budget, stats }: BudgetSummaryProps) {
             {formatCurrency(fixedPlanned)}
           </p>
           <p className="stat-note mt-2">
-            Lançados em despesas: {formatCurrency(fixedSpent)}
+            Valor base informado no orçamento
           </p>
         </div>
 
@@ -120,6 +124,30 @@ export function BudgetSummary({ budget, stats }: BudgetSummaryProps) {
           <p className="text-[var(--text-xs)] text-[var(--text-secondary)]">
             Estratégia: <span className="font-medium text-[var(--text-primary)]">{budget.strategy}</span>
           </p>
+
+          {aiPrediction && (
+            <div className="mt-4 rounded-xl border border-[var(--accent-primary)]/25 bg-[var(--accent-primary)]/8 p-3">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-[var(--text-xs)] font-semibold uppercase tracking-[0.08em] text-[var(--accent-primary)]">
+                  Previsao da IA
+                </span>
+                <span className="text-[var(--text-xs)] text-[var(--text-secondary)]">
+                  Confianca: {(aiPrediction.confidence * 100).toFixed(0)}%
+                </span>
+              </div>
+              <p className="text-[var(--text-sm)] text-[var(--text-primary)]">
+                Orcamento diario recomendado: <strong>{formatCurrency(aiPrediction.recommendedDailyBudget)}</strong>
+              </p>
+              <p className="mt-1 text-[var(--text-xs)] text-[var(--text-secondary)]">
+                Nivel de risco: {aiPrediction.riskLevel} | Gasto mensal previsto: {formatCurrency(aiPrediction.predictedTotalSpent)}
+              </p>
+              {aiPrediction.insights?.length > 0 && (
+                <p className="mt-2 text-[var(--text-xs)] text-[var(--text-secondary)]">
+                  {aiPrediction.insights[0]}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Card>

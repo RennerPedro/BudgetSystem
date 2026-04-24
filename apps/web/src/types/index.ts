@@ -1,6 +1,6 @@
 export type BudgetStatus = 'HEALTHY' | 'WARNING' | 'CRITICAL' | 'NEGATIVE';
 
-export type ExpenseType = 'FIXED' | 'VARIABLE';
+export type ExpenseType = 'VARIABLE';
 
 export type AlertType = 
   | 'BUDGET_WARNING' 
@@ -66,4 +66,15 @@ export interface ExpenseStats {
 export interface AuthResponse {
   access_token: string;
   user: User;
+}
+
+export type AIRiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
+export interface AIBudgetPrediction {
+  predictedTotalSpent: number;
+  recommendedDailyBudget: number;
+  confidence: number;
+  riskLevel: AIRiskLevel;
+  insights: string[];
+  reasoning: string;
 }

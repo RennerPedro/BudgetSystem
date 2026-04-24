@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useExpenses } from '@/hooks/useExpenses';
-import { ExpenseType } from '@/types';
+import { useDeepSeek } from '@/hooks/useDeepSeek';
+import { deepseekService } from '@/services/deepseek.service';
 
 interface ExpenseFormProps {
   month?: number;
@@ -15,10 +16,11 @@ interface ExpenseFormProps {
 export function ExpenseForm({ month, year }: ExpenseFormProps = {}) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-  const [type, setType] = useState<ExpenseType>('VARIABLE');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isSuggestingCategory, setIsSuggestingCategory] = useState(false);
 
   const { createExpense, isCreating } = useExpenses(month, year);
+  const { keyStatus } = useDeepSeek();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,18 +29,32 @@ export function ExpenseForm({ month, year }: ExpenseFormProps = {}) {
       {
         amount: parseFloat(amount),
         category,
-        type,
+        type: 'VARIABLE',
         date,
       },
       {
         onSuccess: () => {
           setAmount('');
           setCategory('');
-          setType('VARIABLE');
           setDate(new Date().toISOString().split('T')[0]);
         },
       }
     );
+  };
+
+  const handleSuggestCategory = async () => {
+    const parsedAmount = parseFloat(amount);
+    if (!amount || Number.isNaN(parsedAmount) || parsedAmount <= 0) {
+      return;
+    }
+
+    setIsSuggestingCategory(true);
+    try {
+      const suggestion = await deepseekService.suggestCategory(category || 'expense', parsedAmount);
+      setCategory(suggestion.category);
+    } finally {
+      setIsSuggestingCategory(false);
+    }
   };
 
   return (
@@ -66,20 +82,16 @@ export function ExpenseForm({ month, year }: ExpenseFormProps = {}) {
             onChange={(e) => setCategory(e.target.value)}
             required
           />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-[var(--text-sm)] font-medium text-[var(--text-secondary)]">
-            Tipo
-          </label>
-          <select
-            className="input-shell"
-            value={type}
-            onChange={(e) => setType(e.target.value as ExpenseType)}
-          >
-            <option value="VARIABLE">Variável</option>
-            <option value="FIXED">Fixa</option>
-          </select>
+          {keyStatus?.enabled && (
+            <button
+              type="button"
+              onClick={handleSuggestCategory}
+              className="mt-2 text-[var(--text-xs)] font-medium text-[var(--accent-primary)]"
+              disabled={isSuggestingCategory}
+            >
+              {isSuggestingCategory ? 'Sugerindo categoria...' : 'Sugerir categoria com AI'}
+            </button>
+          )}
         </div>
 
         <Input

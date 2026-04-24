@@ -11,6 +11,12 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useExpenses } from '@/hooks/useExpenses';
 import { Plus, TrendingUp } from 'lucide-react';
+import { useDeepSeek } from '@/hooks/useDeepSeek';
+import { useBudgetPrediction } from '@/hooks/useBudgetPrediction';
+import { AISetupModal } from '@/components/ai/AISetupModal';
+import { ChatBubble } from '@/components/ai/ChatBubble';
+import { ChatPanel } from '@/components/ai/ChatPanel';
+import { StrategyType } from '@/types';
 
 export default function DashboardPage() {
   const now = new Date();
@@ -29,8 +35,12 @@ export default function DashboardPage() {
     updateFixed,
     isUpdatingFixed,
   } = useBudget();
+  const { keyStatus, isLoadingStatus } = useDeepSeek();
   const budgetMonth = budget?.month ?? currentMonth;
   const budgetYear = budget?.year ?? currentYear;
+
+  const shouldLoadPrediction = !!budget && budget.strategy === 'SMART' && !!keyStatus?.enabled;
+  const { data: predictionResult } = useBudgetPrediction(budget, shouldLoadPrediction);
 
   const {
     expenses,
@@ -45,6 +55,8 @@ export default function DashboardPage() {
   const [fixedInput, setFixedInput] = useState('');
   const [selectedStrategy, setSelectedStrategy] = useState<'LINEAR' | 'AGGRESSIVE' | 'SMART'>('LINEAR');
   const [strategy, setStrategy] = useState<'LINEAR' | 'AGGRESSIVE' | 'SMART'>('LINEAR');
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     if (budget) {
@@ -53,6 +65,12 @@ export default function DashboardPage() {
       setSelectedStrategy(budget.strategy);
     }
   }, [budget]);
+
+  useEffect(() => {
+    if (!isLoadingStatus && keyStatus && !keyStatus.configured && budget) {
+      setShowAIModal(true);
+    }
+  }, [budget, isLoadingStatus, keyStatus]);
 
   const handleCreateBudget = (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,7 +192,7 @@ export default function DashboardPage() {
               <select
                 className="input-shell"
                 value={strategy}
-                onChange={(e) => setStrategy(e.target.value as any)}
+                onChange={(e) => setStrategy(e.target.value as StrategyType)}
               >
                 <option value="LINEAR">Linear - Distribuição uniforme</option>
                 <option value="AGGRESSIVE">Agressiva - Correção rápida de excessos</option>
@@ -216,7 +234,7 @@ export default function DashboardPage() {
 
       {budget && (
         <>
-          <BudgetSummary budget={budget} stats={stats} />
+          <BudgetSummary budget={budget} stats={stats} aiPrediction={predictionResult?.prediction || null} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -292,6 +310,14 @@ export default function DashboardPage() {
               <AlertsPanel />
             </div>
           </div>
+        </>
+      )}
+
+      <AISetupModal open={showAIModal} onClose={() => setShowAIModal(false)} />
+      {keyStatus?.enabled && (
+        <>
+          <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />
+          <ChatBubble onClick={() => setChatOpen((prev) => !prev)} />
         </>
       )}
     </div>
