@@ -12,7 +12,7 @@ export class BudgetProcessor extends WorkerHost {
     super();
   }
 
-  async process(job: Job): Promise<any> {
+  async process(job: Job): Promise<unknown> {
     this.logger.log(`Processing job ${job.id} of type ${job.name}`);
 
     switch (job.name) {
@@ -30,7 +30,8 @@ export class BudgetProcessor extends WorkerHost {
       await this.budgetService.recalculateBudget(budgetId);
       this.logger.log(`Budget ${budgetId} recalculated successfully`);
     } catch (error) {
-      this.logger.error(`Failed to recalculate budget ${budgetId}`, error.stack);
+      const errorMessage = error instanceof Error ? error.stack || error.message : String(error);
+      this.logger.error(`Failed to recalculate budget ${budgetId}`, errorMessage);
       throw error;
     }
   }

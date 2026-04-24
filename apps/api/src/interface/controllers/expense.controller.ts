@@ -4,6 +4,7 @@ import { ExpenseService } from '../../application/services/expense.service';
 import { CreateExpenseDto, ExpenseResponseDto, ExpenseStatsDto } from '../../application/dtos';
 import { JwtAuthGuard } from '../../infrastructure/auth/jwt-auth.guard';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
+import { AuthenticatedUser } from '../../infrastructure/auth/authenticated-user.interface';
 
 @ApiTags('expenses')
 @ApiBearerAuth()
@@ -16,7 +17,7 @@ export class ExpenseController {
   @ApiOperation({ summary: 'Create a new expense' })
   @ApiResponse({ status: 201, description: 'Expense created', type: ExpenseResponseDto })
   async createExpense(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateExpenseDto,
   ): Promise<ExpenseResponseDto> {
     return this.expenseService.createExpense(user.userId, dto);
@@ -28,7 +29,7 @@ export class ExpenseController {
   @ApiQuery({ name: 'year', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'List of expenses', type: [ExpenseResponseDto] })
   async getExpenses(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('month') month?: number,
     @Query('year') year?: number,
   ): Promise<ExpenseResponseDto[]> {
@@ -45,7 +46,7 @@ export class ExpenseController {
   @ApiQuery({ name: 'year', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Expense statistics', type: ExpenseStatsDto })
   async getStats(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('month') month?: number,
     @Query('year') year?: number,
   ): Promise<ExpenseStatsDto> {
@@ -61,7 +62,7 @@ export class ExpenseController {
   @ApiResponse({ status: 200, description: 'Expense details', type: ExpenseResponseDto })
   @ApiResponse({ status: 404, description: 'Expense not found' })
   async getExpenseById(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
   ): Promise<ExpenseResponseDto> {
     return this.expenseService.getExpenseById(user.userId, id);
@@ -72,7 +73,7 @@ export class ExpenseController {
   @ApiResponse({ status: 200, description: 'Expense deleted' })
   @ApiResponse({ status: 404, description: 'Expense not found' })
   async deleteExpense(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
   ): Promise<{ message: string }> {
     await this.expenseService.deleteExpense(user.userId, id);

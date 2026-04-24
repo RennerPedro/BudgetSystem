@@ -3,28 +3,28 @@ import { AlertType, AlertSeverity } from '../../domain/types';
 
 export class AlertResponseDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  userId: string;
+  userId!: string;
 
   @ApiProperty({ enum: ['BUDGET_WARNING', 'BUDGET_CRITICAL', 'BUDGET_NEGATIVE', 'DAILY_LIMIT_EXCEEDED'] })
-  type: AlertType;
+  type!: AlertType;
 
   @ApiProperty()
-  message: string;
+  message!: string;
 
   @ApiProperty({ enum: ['INFO', 'WARNING', 'CRITICAL'] })
-  severity: AlertSeverity;
+  severity!: AlertSeverity;
 
   @ApiProperty()
-  read: boolean;
+  read!: boolean;
 
   @ApiProperty()
-  createdAt: Date;
+  createdAt!: Date;
 }
 
 export class MarkAlertReadDto {
   @ApiProperty()
-  alertIds: string[];
+  alertIds!: string[];
 }

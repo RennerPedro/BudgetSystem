@@ -10,6 +10,7 @@ import {
 } from '../../application/dtos';
 import { JwtAuthGuard } from '../../infrastructure/auth/jwt-auth.guard';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
+import { AuthenticatedUser } from '../../infrastructure/auth/authenticated-user.interface';
 
 @ApiTags('budget')
 @ApiBearerAuth()
@@ -23,7 +24,7 @@ export class BudgetController {
   @ApiResponse({ status: 201, description: 'Budget created', type: BudgetResponseDto })
   @ApiResponse({ status: 400, description: 'Budget already exists' })
   async createBudget(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateBudgetDto,
   ): Promise<BudgetResponseDto> {
     return this.budgetService.createBudget(user.userId, dto);
@@ -33,7 +34,7 @@ export class BudgetController {
   @ApiOperation({ summary: 'Get current month budget' })
   @ApiResponse({ status: 200, description: 'Current budget', type: BudgetResponseDto })
   @ApiResponse({ status: 404, description: 'Budget not found' })
-  async getCurrentBudget(@CurrentUser() user: any): Promise<BudgetResponseDto> {
+  async getCurrentBudget(@CurrentUser() user: AuthenticatedUser): Promise<BudgetResponseDto> {
     return this.budgetService.getCurrentBudget(user.userId);
   }
 
@@ -41,7 +42,7 @@ export class BudgetController {
   @ApiOperation({ summary: 'Update budget strategy' })
   @ApiResponse({ status: 200, description: 'Strategy updated', type: BudgetResponseDto })
   async updateStrategy(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateBudgetStrategyDto,
   ): Promise<BudgetResponseDto> {
     return this.budgetService.updateStrategy(user.userId, dto);
@@ -51,7 +52,7 @@ export class BudgetController {
   @ApiOperation({ summary: 'Update current month income' })
   @ApiResponse({ status: 200, description: 'Income updated', type: BudgetResponseDto })
   async updateIncome(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateBudgetIncomeDto,
   ): Promise<BudgetResponseDto> {
     return this.budgetService.updateIncome(user.userId, dto);
@@ -61,7 +62,7 @@ export class BudgetController {
   @ApiOperation({ summary: 'Update current month fixed expenses' })
   @ApiResponse({ status: 200, description: 'Fixed expenses updated', type: BudgetResponseDto })
   async updateFixed(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateBudgetFixedDto,
   ): Promise<BudgetResponseDto> {
     return this.budgetService.updateFixed(user.userId, dto);
@@ -70,7 +71,7 @@ export class BudgetController {
   @Get('adjustments')
   @ApiOperation({ summary: 'Get budget adjustment history' })
   @ApiResponse({ status: 200, description: 'Adjustment history' })
-  async getAdjustmentHistory(@CurrentUser() user: any) {
+  async getAdjustmentHistory(@CurrentUser() user: AuthenticatedUser) {
     return this.budgetService.getAdjustmentHistory(user.userId);
   }
 }

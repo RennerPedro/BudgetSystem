@@ -21,7 +21,6 @@ export class LinearStrategy implements BudgetStrategy {
     const reservePercent = this.normalizeReservePercent(targetReservePercent ?? 0);
     const reserveAmount = totalIncome * reservePercent;
 
-    // Cálculo base
     const available = Math.max(0, totalIncome - totalFixed - reserveAmount);
     const remainingBalance = available - totalSpent;
     const remainingDays = totalDays - currentDay;
@@ -38,7 +37,6 @@ export class LinearStrategy implements BudgetStrategy {
       };
     }
 
-    // Prevenir divisão por zero
     const baseDaily = remainingDays > 0
       ? remainingBalance / remainingDays
       : 0;
@@ -47,7 +45,6 @@ export class LinearStrategy implements BudgetStrategy {
       ? Math.abs(baseDaily - previousDailyBudget) / previousDailyBudget
       : 1;
 
-    // Se a variação é muito pequena, mantém orçamento anterior para evitar oscilações
     const targetDaily = variationRatio < this.NEUTRAL_ZONE_RATIO
       ? previousDailyBudget
       : baseDaily;
@@ -61,7 +58,6 @@ export class LinearStrategy implements BudgetStrategy {
 
     const adjustment = newDailyBudget - previousDailyBudget;
 
-    // Determinar status
     let status: BudgetStatus = 'HEALTHY';
     let reason = 'Budget within expected range';
 

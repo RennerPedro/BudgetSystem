@@ -8,11 +8,7 @@ export class AlertService {
   constructor(private prisma: PrismaService) {}
 
   async getUserAlerts(userId: string, unreadOnly = false): Promise<AlertResponseDto[]> {
-    const where: any = { userId };
-
-    if (unreadOnly) {
-      where.read = false;
-    }
+    const where = unreadOnly ? { userId, read: false } : { userId };
 
     const alerts = await this.prisma.alert.findMany({
       where,

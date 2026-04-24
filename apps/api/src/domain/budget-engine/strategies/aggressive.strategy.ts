@@ -20,7 +20,6 @@ export class AggressiveStrategy implements BudgetStrategy {
     const reservePercent = this.normalizeReservePercent(targetReservePercent ?? 0);
     const reserveAmount = totalIncome * reservePercent;
 
-    // Cálculo base
     const available = Math.max(0, totalIncome - totalFixed - reserveAmount);
     const remainingBalance = available - totalSpent;
     const remainingDays = totalDays - currentDay;
@@ -37,24 +36,20 @@ export class AggressiveStrategy implements BudgetStrategy {
       };
     }
 
-    // Calcular gasto esperado até agora
     const expectedSpent = currentDay * (available / totalDays);
     const excess = Math.max(0, totalSpent - expectedSpent);
     const excessRatio = available > 0 ? excess / available : 0;
     const correctionDays = this.getCorrectionDays(excessRatio);
 
-    // Se há excesso, aplicar correção agressiva
     let newDailyBudget: number;
     let reason: string;
     const baseDaily = remainingDays > 0 ? remainingBalance / remainingDays : 0;
 
     if (excessRatio > this.NEUTRAL_ZONE_RATIO && remainingDays > 0) {
-      // Corrigir o excesso nos próximos dias
       const correctionAmount = excess / Math.min(correctionDays, remainingDays);
       newDailyBudget = baseDaily - correctionAmount;
       reason = `Aggressive correction in ${correctionDays} days - excess of ${excess.toFixed(2)} detected`;
     } else {
-      // Se não há excesso, usar distribuição linear
       newDailyBudget = baseDaily;
       reason = 'No excess detected - linear distribution applied';
     }
@@ -66,7 +61,6 @@ export class AggressiveStrategy implements BudgetStrategy {
 
     const adjustment = newDailyBudget - previousDailyBudget;
 
-    // Determinar status
     let status: BudgetStatus = 'HEALTHY';
 
     if (excessRatio > 0.15) {

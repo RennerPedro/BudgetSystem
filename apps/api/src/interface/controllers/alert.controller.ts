@@ -4,6 +4,7 @@ import { AlertService } from '../../application/services/alert.service';
 import { AlertResponseDto } from '../../application/dtos';
 import { JwtAuthGuard } from '../../infrastructure/auth/jwt-auth.guard';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
+import { AuthenticatedUser } from '../../infrastructure/auth/authenticated-user.interface';
 
 @ApiTags('alerts')
 @ApiBearerAuth()
@@ -17,7 +18,7 @@ export class AlertController {
   @ApiQuery({ name: 'unreadOnly', required: false, type: Boolean })
   @ApiResponse({ status: 200, description: 'List of alerts', type: [AlertResponseDto] })
   async getAlerts(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('unreadOnly') unreadOnly?: boolean,
   ): Promise<AlertResponseDto[]> {
     return this.alertService.getUserAlerts(user.userId, unreadOnly === true);
@@ -26,7 +27,7 @@ export class AlertController {
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread alerts count' })
   @ApiResponse({ status: 200, description: 'Unread count' })
-  async getUnreadCount(@CurrentUser() user: any): Promise<{ count: number }> {
+  async getUnreadCount(@CurrentUser() user: AuthenticatedUser): Promise<{ count: number }> {
     const count = await this.alertService.getUnreadCount(user.userId);
     return { count };
   }
@@ -35,7 +36,7 @@ export class AlertController {
   @ApiOperation({ summary: 'Mark alerts as read' })
   @ApiResponse({ status: 200, description: 'Alerts marked as read' })
   async markAsRead(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() body: { alertIds: string[] },
   ): Promise<{ message: string }> {
     await this.alertService.markAsRead(user.userId, body.alertIds);
@@ -45,7 +46,7 @@ export class AlertController {
   @Post('mark-all-read')
   @ApiOperation({ summary: 'Mark all alerts as read' })
   @ApiResponse({ status: 200, description: 'All alerts marked as read' })
-  async markAllAsRead(@CurrentUser() user: any): Promise<{ message: string }> {
+  async markAllAsRead(@CurrentUser() user: AuthenticatedUser): Promise<{ message: string }> {
     await this.alertService.markAllAsRead(user.userId);
     return { message: 'All alerts marked as read' };
   }

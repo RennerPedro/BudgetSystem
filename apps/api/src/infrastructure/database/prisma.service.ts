@@ -1,6 +1,10 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
+interface DeletableModel {
+  deleteMany: () => Promise<unknown>;
+}
+
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
@@ -24,7 +28,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       models.map((modelKey) => {
         const model = this[modelKey as keyof typeof this];
         if (model && typeof model === 'object' && 'deleteMany' in model) {
-          return (model as any).deleteMany();
+          return (model as DeletableModel).deleteMany();
         }
       }),
     );

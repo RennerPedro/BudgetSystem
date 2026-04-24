@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsEnum, IsDateString, Min } from 'class-validator';
+import { IsNumber, IsString, IsEnum, IsDateString, Min, IsOptional, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ExpenseType } from '../../domain/types';
 
@@ -6,60 +6,66 @@ export class CreateExpenseDto {
   @ApiProperty({ example: 150.50, description: 'Expense amount' })
   @IsNumber()
   @Min(0)
-  amount: number;
+  amount!: number;
 
-  @ApiProperty({ enum: ['FIXED', 'VARIABLE'], example: 'VARIABLE' })
-  @IsEnum(['FIXED', 'VARIABLE'])
-  type: ExpenseType;
+  @ApiProperty({ enum: ['VARIABLE'], example: 'VARIABLE' })
+  @IsEnum(['VARIABLE'])
+  type!: ExpenseType;
 
   @ApiProperty({ example: 'food', description: 'Expense category' })
+  @IsOptional()
   @IsString()
-  category: string;
+  category?: string;
+
+  @ApiProperty({ example: false, required: false })
+  @IsOptional()
+  @IsBoolean()
+  autoCategorize?: boolean;
 
   @ApiProperty({ example: '2026-03-25', description: 'Expense date' })
   @IsDateString()
-  date: string;
+  date!: string;
 }
 
 export class ExpenseResponseDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  userId: string;
+  userId!: string;
 
   @ApiProperty()
-  budgetId: string | null;
+  budgetId!: string | null;
 
   @ApiProperty()
-  amount: number;
+  amount!: number;
 
   @ApiProperty({ enum: ['FIXED', 'VARIABLE'] })
-  type: ExpenseType;
+  type!: ExpenseType;
 
   @ApiProperty()
-  category: string;
+  category!: string;
 
   @ApiProperty()
-  date: Date;
+  date!: Date;
 
   @ApiProperty()
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
 
 export class ExpenseStatsDto {
   @ApiProperty()
-  total: number;
+  total!: number;
 
   @ApiProperty()
-  count: number;
+  count!: number;
 
   @ApiProperty()
-  byCategory: Record<string, number>;
+  byCategory!: Record<string, number>;
 
   @ApiProperty()
-  byType: Record<string, number>;
+  byType!: Record<string, number>;
 }

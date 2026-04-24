@@ -6,12 +6,12 @@ export class CreateBudgetDto {
   @ApiProperty({ example: 5000, description: 'Total monthly income' })
   @IsNumber()
   @Min(0)
-  totalIncome: number;
+  totalIncome!: number;
 
   @ApiProperty({ example: 2000, description: 'Total fixed expenses' })
   @IsNumber()
   @Min(0)
-  totalFixed: number;
+  totalFixed!: number;
 
   @ApiPropertyOptional({ enum: ['LINEAR', 'AGGRESSIVE', 'SMART'], default: 'LINEAR' })
   @IsOptional()
@@ -22,63 +22,63 @@ export class CreateBudgetDto {
 export class UpdateBudgetStrategyDto {
   @ApiProperty({ enum: ['LINEAR', 'AGGRESSIVE', 'SMART'] })
   @IsEnum(['LINEAR', 'AGGRESSIVE', 'SMART'])
-  strategy: StrategyType;
+  strategy!: StrategyType;
 }
 
 export class UpdateBudgetIncomeDto {
   @ApiProperty({ example: 5200, description: 'Monthly income amount' })
   @IsNumber()
   @Min(0)
-  totalIncome: number;
+  totalIncome!: number;
 }
 
 export class UpdateBudgetFixedDto {
   @ApiProperty({ example: 2000, description: 'Monthly fixed expenses amount' })
   @IsNumber()
   @Min(0)
-  totalFixed: number;
+  totalFixed!: number;
 }
 
 export class BudgetResponseDto {
   @ApiProperty()
-  id: string;
+  id!: string;
 
   @ApiProperty()
-  userId: string;
+  userId!: string;
 
   @ApiProperty()
-  month: number;
+  month!: number;
 
   @ApiProperty()
-  year: number;
+  year!: number;
 
   @ApiProperty()
-  totalIncome: number;
+  totalIncome!: number;
 
   @ApiProperty()
-  totalFixed: number;
+  totalFixed!: number;
 
   @ApiProperty()
-  totalSpent: number;
+  totalSpent!: number;
 
   @ApiProperty()
-  availableBalance: number;
+  availableBalance!: number;
 
   @ApiProperty()
-  remainingBalance: number;
+  remainingBalance!: number;
 
   @ApiProperty()
-  dailyBudget: number;
+  dailyBudget!: number;
 
   @ApiProperty({ enum: ['LINEAR', 'AGGRESSIVE', 'SMART'] })
-  strategy: StrategyType;
+  strategy!: StrategyType;
 
   @ApiProperty({ enum: ['HEALTHY', 'WARNING', 'CRITICAL', 'NEGATIVE'] })
-  status: BudgetStatus;
+  status!: BudgetStatus;
 
   @ApiProperty()
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
