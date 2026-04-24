@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
@@ -8,6 +9,10 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
+
+type ApiErrorResponse = {
+  message?: string | string[];
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -41,8 +46,10 @@ export default function RegisterPage() {
       });
       login(response.access_token, response.user);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao criar conta');
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorResponse>;
+      const message = error.response?.data?.message;
+      setError(Array.isArray(message) ? message[0] || 'Erro ao criar conta' : message || 'Erro ao criar conta');
     } finally {
       setIsLoading(false);
     }

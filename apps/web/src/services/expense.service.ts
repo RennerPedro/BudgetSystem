@@ -6,6 +6,7 @@ export interface CreateExpenseDto {
   type: ExpenseType;
   category: string;
   date: string;
+  autoCategorize?: boolean;
 }
 
 export const expenseService = {

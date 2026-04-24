@@ -1,6 +1,18 @@
 import { api } from '@/lib/api';
 import { Budget, StrategyType } from '@/types';
 
+export interface BudgetAdjustment {
+  id: string;
+  budgetId: string;
+  previousDailyBudget: number;
+  newDailyBudget: number;
+  adjustment: number;
+  reason: string;
+  strategy: StrategyType;
+  status: string;
+  createdAt: string;
+}
+
 export interface CreateBudgetDto {
   totalIncome: number;
   totalFixed: number;
@@ -33,8 +45,8 @@ export const budgetService = {
     return data;
   },
 
-  async getAdjustmentHistory(): Promise<any[]> {
-    const { data } = await api.get<any[]>('/budget/adjustments');
+  async getAdjustmentHistory(): Promise<BudgetAdjustment[]> {
+    const { data } = await api.get<BudgetAdjustment[]>('/budget/adjustments');
     return data;
   },
 };

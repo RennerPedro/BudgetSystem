@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { expenseService, CreateExpenseDto } from '@/services/expense.service';
+import { Expense } from '@/types';
 
 export function useExpenses(month?: number, year?: number) {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export function useExpenses(month?: number, year?: number) {
   const createMutation = useMutation({
     mutationFn: (dto: CreateExpenseDto) => expenseService.createExpense(dto),
     onSuccess: async (createdExpense) => {
-      queryClient.setQueryData(expensesKey, (oldExpenses: any) => {
+      queryClient.setQueryData<Expense[]>(expensesKey, (oldExpenses) => {
         const current = Array.isArray(oldExpenses) ? oldExpenses : [];
         return [createdExpense, ...current];
       });
@@ -38,11 +39,11 @@ export function useExpenses(month?: number, year?: number) {
     mutationFn: (id: string) => expenseService.deleteExpense(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: expensesKey });
-      const previousExpenses = queryClient.getQueryData(expensesKey);
+      const previousExpenses = queryClient.getQueryData<Expense[]>(expensesKey);
 
-      queryClient.setQueryData(expensesKey, (oldExpenses: any) => {
+      queryClient.setQueryData<Expense[]>(expensesKey, (oldExpenses) => {
         const current = Array.isArray(oldExpenses) ? oldExpenses : [];
-        return current.filter((expense: any) => expense.id !== id);
+        return current.filter((expense) => expense.id !== id);
       });
 
       return { previousExpenses };

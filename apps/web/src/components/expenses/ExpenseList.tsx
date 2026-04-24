@@ -45,7 +45,6 @@ export function ExpenseList({
   const isDeleting = isDeletingFromProps ?? isDeletingFromHook;
 
   const totalVariable = stats?.byType?.VARIABLE || 0;
-  const totalFixed = stats?.byType?.FIXED || 0;
 
   if (expenses.length === 0) {
     return (
@@ -62,14 +61,8 @@ export function ExpenseList({
   return (
     <Card title="Despesas do Mês">
       <div className="mb-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-overlay)] p-3 text-[var(--text-sm)] text-[var(--text-secondary)]">
-        <span className="font-medium text-[var(--text-primary)]">Variáveis:</span>{' '}
-        <span className="financial-figure">{formatCurrency(totalVariable)}</span>
-        {' • '}
-        <span className="font-medium text-[var(--text-primary)]">Fixas:</span>{' '}
-        <span className="financial-figure">{formatCurrency(totalFixed)}</span>
-        {' • '}
         <span className="font-medium text-[var(--text-primary)]">Total listado:</span>{' '}
-        <span className="financial-figure">{formatCurrency(totalVariable + totalFixed)}</span>
+        <span className="financial-figure">{formatCurrency(totalVariable)}</span>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-raised)]">
@@ -93,9 +86,7 @@ export function ExpenseList({
             <div>
               <Badge
                 variant="default"
-                className={expense.type === 'FIXED'
-                  ? 'border-[rgba(245,166,35,0.35)] bg-[rgba(245,166,35,0.16)] text-[var(--accent-warning)]'
-                  : 'border-[rgba(45,127,249,0.35)] bg-[var(--accent-primary-muted)] text-[var(--accent-primary)]'}
+                className="border-[rgba(45,127,249,0.35)] bg-[var(--accent-primary-muted)] text-[var(--accent-primary)]"
               >
                 {expense.type}
               </Badge>
