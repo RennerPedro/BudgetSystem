@@ -14,12 +14,19 @@ model User {
   id           String    @id @default(uuid())
   email        String    @unique
   passwordHash String    @map("password_hash")
+  encryptedDeepseekKey String? @map("encrypted_deepseek_key")
+  deepseekKeyIv String? @map("deepseek_key_iv")
+  deepseekKeyTag String? @map("deepseek_key_tag")
+  deepseekKeySalt String? @map("deepseek_key_salt")
+  deepseekEnabled Boolean @default(false) @map("deepseek_enabled")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
   budgets     Budget[]
   expenses    Expense[]
   alerts      Alert[]
+  aiUsageLogs DeepSeekUsageLog[]
+  aiChatMessages AIChatMessage[]
 
   @@map("users")
 }
@@ -100,4 +107,40 @@ model Alert {
   @@index([read])
   @@index([severity])
   @@map("alerts")
+}
+
+model DeepSeekUsageLog {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  feature           String
+  model             String
+  promptTokens      Int      @default(0) @map("prompt_tokens")
+  completionTokens  Int      @default(0) @map("completion_tokens")
+  totalTokens       Int      @default(0) @map("total_tokens")
+  success           Boolean  @default(true)
+  errorMessage      String?  @map("error_message")
+  cached            Boolean  @default(false)
+  durationMs        Int      @default(0) @map("duration_ms")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([feature])
+  @@index([createdAt])
+  @@map("deepseek_usage_logs")
+}
+
+model AIChatMessage {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  role       String
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("ai_chat_messages")
 }
