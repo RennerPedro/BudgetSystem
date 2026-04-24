@@ -12,7 +12,11 @@ export function useDeepSeek() {
   const setKeyMutation = useMutation({
     mutationFn: ({ apiKey, autoEnable }: { apiKey: string; autoEnable?: boolean }) =>
       deepseekService.setApiKey(apiKey, autoEnable),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData(['deepseek', 'key-status'], {
+        configured: true,
+        enabled: variables.autoEnable ?? true,
+      });
       queryClient.invalidateQueries({ queryKey: ['deepseek', 'key-status'] });
       queryClient.invalidateQueries({ queryKey: ['budget', 'current'] });
     },
