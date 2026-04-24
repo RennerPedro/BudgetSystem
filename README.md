@@ -29,13 +29,15 @@ O que este projeto evidencia:
 - Cálculo diário de gasto por estratégia:
 	- LINEAR
 	- AGGRESSIVE
-	- SMART (heurística, AI-ready)
+	- SMART (heurística + DeepSeek com fallback automático)
 - Estados do orçamento:
 	- HEALTHY
 	- WARNING
 	- CRITICAL
 	- NEGATIVE
 - Painel de alertas e histórico de ajustes.
+- Assistente conversacional de orçamento com contexto real do usuário.
+- Sugestão de categoria por IA no lançamento de despesas.
 
 ## Architecture
 
@@ -127,6 +129,40 @@ npx jest --config apps/api/package.json --rootDir apps/api --testRegex test/unit
 - Recalculo síncrono em fluxos críticos de UX para evitar inconsistência visual.
 - Atualização otimista e refetch controlado no frontend para manter UI responsiva.
 - Cálculo diário com limites de viabilidade para evitar sugestões irreais de gasto.
+
+## AI Integration
+
+Fluxo zero-configuração:
+
+- No dashboard, o sistema detecta se o usuário não possui chave configurada.
+- O modal "Unlock AI-Powered Budgeting" solicita a chave da DeepSeek uma única vez.
+- A chave é validada no backend antes de ser persistida.
+
+Segurança:
+
+- Chave criptografada com AES-256-GCM (IV + AuthTag + salt por usuário).
+- Chave armazenada no banco (não em variáveis de ambiente de aplicação).
+- Prompt sanitization para reduzir risco de prompt injection e payloads abusivos.
+- Limites hard-coded para free tier: 3 RPM e 200 RPD por usuário.
+
+Confiabilidade e custo:
+
+- Retry com exponential backoff para falhas transitórias da DeepSeek.
+- Cache Redis por 24h para contextos idênticos.
+- Log de uso por feature com tokens consumidos, duração e sucesso/erro.
+
+Graceful degradation:
+
+- Se IA estiver indisponível, a estratégia SMART mantém cálculo heurístico automaticamente.
+
+Rotas principais:
+
+- `POST /api/user/deepseek-key`
+- `GET /api/user/deepseek-key/status`
+- `POST /api/deepseek/predict-budget`
+- `POST /api/deepseek/chat`
+- `GET /api/deepseek/chat/history`
+- `POST /api/deepseek/categorize-expense`
 
 ## Roadmap
 
