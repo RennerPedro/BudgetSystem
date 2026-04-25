@@ -28,7 +28,6 @@ async function bootstrap() {
     .addTag('auth', 'Authentication endpoints')
     .addTag('budget', 'Budget management')
     .addTag('expenses', 'Expense tracking')
-    .addTag('alerts', 'Notifications and alerts')
     .addBearerAuth()
     .build();
 

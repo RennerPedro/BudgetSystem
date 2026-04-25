@@ -5,7 +5,6 @@ import { useBudget } from '@/hooks/useBudget';
 import { BudgetSummary } from '@/components/budget/BudgetSummary';
 import { ExpenseForm } from '@/components/expenses/ExpenseForm';
 import { ExpenseList } from '@/components/expenses/ExpenseList';
-import { AlertsPanel } from '@/components/alerts/AlertsPanel';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -228,7 +227,7 @@ export default function DashboardPage() {
       <div className="section-header">
         <div>
           <h1 className="text-[var(--text-2xl)] font-semibold text-[var(--text-primary)]">Dashboard</h1>
-          <p className="mt-1 text-[var(--text-base)] text-[var(--text-secondary)]">Visão consolidada de orçamento, despesas e alertas</p>
+          <p className="mt-1 text-[var(--text-base)] text-[var(--text-secondary)]">Visão consolidada de orçamento e despesas</p>
         </div>
       </div>
 
@@ -307,7 +306,6 @@ export default function DashboardPage() {
               </Card>
 
               <ExpenseForm month={budgetMonth} year={budgetYear} />
-              <AlertsPanel />
             </div>
           </div>
         </>

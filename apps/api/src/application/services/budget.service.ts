@@ -278,44 +278,6 @@ export class BudgetService {
         status: result.status,
       },
     });
-
-    await this.generateAlertsIfNeeded(budget.userId, result.status, result.reason);
-  }
-
-  private async generateAlertsIfNeeded(
-    userId: string,
-    status: string,
-    reason?: string,
-  ): Promise<void> {
-    let alertType: string | null = null;
-    let severity: string = 'INFO';
-    let message = reason || 'Budget status updated';
-
-    switch (status) {
-      case 'WARNING':
-        alertType = 'BUDGET_WARNING';
-        severity = 'WARNING';
-        break;
-      case 'CRITICAL':
-        alertType = 'BUDGET_CRITICAL';
-        severity = 'CRITICAL';
-        break;
-      case 'NEGATIVE':
-        alertType = 'BUDGET_NEGATIVE';
-        severity = 'CRITICAL';
-        break;
-    }
-
-    if (alertType) {
-      await this.prisma.alert.create({
-        data: {
-          userId,
-          type: alertType,
-          message,
-          severity,
-        },
-      });
-    }
   }
 
   async getAdjustmentHistory(userId: string): Promise<unknown[]> {

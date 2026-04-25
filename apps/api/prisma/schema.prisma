@@ -24,7 +24,6 @@ model User {
 
   budgets     Budget[]
   expenses    Expense[]
-  alerts      Alert[]
   aiUsageLogs DeepSeekUsageLog[]
   aiChatMessages AIChatMessage[]
 
@@ -90,23 +89,6 @@ model BudgetAdjustment {
 
   @@index([budgetId])
   @@map("budget_adjustments")
-}
-
-model Alert {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  type      String   // BUDGET_WARNING | BUDGET_CRITICAL | BUDGET_NEGATIVE | DAILY_LIMIT_EXCEEDED
-  message   String
-  severity  String   // INFO | WARNING | CRITICAL
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([read])
-  @@index([severity])
-  @@map("alerts")
 }
 
 model DeepSeekUsageLog {

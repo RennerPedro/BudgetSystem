@@ -2,14 +2,6 @@ export type BudgetStatus = 'HEALTHY' | 'WARNING' | 'CRITICAL' | 'NEGATIVE';
 
 export type ExpenseType = 'VARIABLE';
 
-export type AlertType = 
-  | 'BUDGET_WARNING' 
-  | 'BUDGET_CRITICAL' 
-  | 'BUDGET_NEGATIVE' 
-  | 'DAILY_LIMIT_EXCEEDED';
-
-export type AlertSeverity = 'INFO' | 'WARNING' | 'CRITICAL';
-
 export type StrategyType = 'LINEAR' | 'AGGRESSIVE' | 'SMART';
 
 export interface User {
@@ -44,16 +36,6 @@ export interface Expense {
   date: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Alert {
-  id: string;
-  userId: string;
-  type: AlertType;
-  message: string;
-  severity: AlertSeverity;
-  read: boolean;
-  createdAt: string;
 }
 
 export interface ExpenseStats {

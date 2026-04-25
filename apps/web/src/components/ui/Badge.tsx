@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { BudgetStatus, AlertSeverity } from '@/types';
+import { BudgetStatus } from '@/types';
 
 interface BadgeProps {
   children: ReactNode;
-  variant?: BudgetStatus | AlertSeverity | 'default';
+  variant?: BudgetStatus | 'default' | 'INFO';
   className?: string;
 }
 

@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  await prisma.alert.deleteMany();
   await prisma.budgetAdjustment.deleteMany();
   await prisma.expense.deleteMany();
   await prisma.budget.deleteMany();
@@ -77,30 +76,6 @@ async function main() {
   });
 
   console.log(`📊 Created ${expenses.length} sample expenses`);
-
-  const alerts = [
-    {
-      type: 'BUDGET_WARNING',
-      message: 'You are 15% over your expected spending for this period',
-      severity: 'WARNING',
-    },
-    {
-      type: 'DAILY_LIMIT_EXCEEDED',
-      message: 'Today\'s spending exceeded your daily budget by $25',
-      severity: 'INFO',
-    },
-  ];
-
-  for (const alert of alerts) {
-    await prisma.alert.create({
-      data: {
-        userId: user.id,
-        ...alert,
-      },
-    });
-  }
-
-  console.log(`🔔 Created ${alerts.length} sample alerts`);
 
   await prisma.budgetAdjustment.create({
     data: {

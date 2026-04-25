@@ -5,7 +5,6 @@ import { BullModule } from '@nestjs/bullmq';
 import { AuthModule } from './modules/auth.module';
 import { BudgetModule } from './modules/budget.module';
 import { ExpenseModule } from './modules/expense.module';
-import { AlertModule } from './modules/alert.module';
 import { DeepSeekModule } from './modules/deepseek/deepseek.module';
 import { JwtAuthGuard } from './infrastructure/auth/jwt-auth.guard';
 
@@ -37,7 +36,6 @@ function getRedisConnection() {
     AuthModule,
     BudgetModule,
     ExpenseModule,
-    AlertModule,
     DeepSeekModule,
   ],
   providers: [

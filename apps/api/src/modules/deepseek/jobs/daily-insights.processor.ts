@@ -72,14 +72,7 @@ export class DailyInsightsProcessor extends WorkerHost {
       const parsed = JSON.parse(completion.content);
       const message = `${parsed.insight || 'Insight unavailable'} Recommendation: ${parsed.recommendation || 'No recommendation.'} Health score: ${Math.max(0, Math.min(100, Number(parsed.healthScore) || 50))}`;
 
-      await this.prisma.alert.create({
-        data: {
-          userId,
-          type: 'BUDGET_WARNING',
-          severity: 'INFO',
-          message: message.slice(0, 300),
-        },
-      });
+      this.logger.log(`Daily insight generated for ${userId}: ${message.slice(0, 300)}`);
     } catch (error) {
       this.logger.warn(`Daily insight generation skipped for ${userId}: ${(error as Error).message}`);
     }
