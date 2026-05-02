@@ -17,7 +17,7 @@ export function BudgetSummary({ budget, stats, aiPrediction }: BudgetSummaryProp
   const variableSpent = stats?.byType?.VARIABLE ?? budget.totalSpent;
   const fixedPlanned = budget.totalFixed;
   const totalSpentInMonth = variableSpent;
-  const remainingRealBalance = budget.totalIncome - totalSpentInMonth;
+  const remainingRealBalance = budget.totalIncome - fixedPlanned - totalSpentInMonth;
   const variablePercentage = budget.totalIncome > 0
     ? (variableSpent / budget.totalIncome) * 100
     : 0;
@@ -60,7 +60,7 @@ export function BudgetSummary({ budget, stats, aiPrediction }: BudgetSummaryProp
             {formatCurrency(fixedPlanned)}
           </p>
           <p className="stat-note mt-2">
-            Valor base informado no orçamento
+           
           </p>
         </div>
 
@@ -73,10 +73,7 @@ export function BudgetSummary({ budget, stats, aiPrediction }: BudgetSummaryProp
             {formatCurrency(variableSpent)}
           </p>
           <p className="financial-figure mt-2 text-[var(--text-xs)] text-[var(--accent-warning)]">
-            {variablePercentage.toFixed(1)}% da renda mensal (somente variáveis)
-          </p>
-          <p className="stat-note financial-figure mt-1">
-            Total lançado no mês: {formatCurrency(totalSpentInMonth)}
+            {variablePercentage.toFixed(1)}% da renda mensal
           </p>
         </div>
 
@@ -87,9 +84,6 @@ export function BudgetSummary({ budget, stats, aiPrediction }: BudgetSummaryProp
           </div>
           <p className="stat-value-primary">
             {formatCurrency(remainingRealBalance)}
-          </p>
-          <p className="stat-note mt-2">
-            Renda - total lançado
           </p>
         </div>
       </div>
